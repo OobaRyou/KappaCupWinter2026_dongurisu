@@ -67,8 +67,7 @@ vcpkg_installed/
 Testing/
 .cache/
 # 重いエンジン本体
-/どんぐリス/k2Engine/
-/どんぐリス/k2EngineLow/
+
 /どんぐリス/tools/
 # Visual Studioのキャッシュ
 **/.vs/
