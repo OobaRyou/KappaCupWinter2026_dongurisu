@@ -66,33 +66,24 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
-/k2Engine/
-/k2EngineLow/
-vs/
-Debug/
-Release/
-x64/
-x86/
-ipch/
-out/
-*.obj
-*.pch
-*.pdb
-*.ilk
-*.idb
-*.tlog
-*.lastbuildstate
-*.sdf
-*.opensdf
-*.VC.db
-*.VC.VC.opendb
-*.exe
-*.dll
-*.lib
-*.exp
-*.user
-*.suo
-*.userosscache
-*.sln.docstates
-Thumbs.db
-.DS_Store
+# 重いエンジン本体
+/どんぐリス/k2Engine/
+/どんぐリス/k2EngineLow/
+/どんぐリス/tools/
+# Visual Studioのキャッシュ
+**/.vs/
+**/Debug/
+**/Release/
+**/x64/
+**/x86/
+**/ipch/
+
+# ビルド生成物
+**/*.obj
+**/*.pch
+**/*.pdb
+**/*.ilk
+**/*.idb
+**/*.tlog
+**/*.dll
+**/*.exe
