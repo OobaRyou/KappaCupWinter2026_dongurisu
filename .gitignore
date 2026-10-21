@@ -84,5 +84,4 @@ Testing/
 **/*.ilk
 **/*.idb
 **/*.tlog
-**/*.dll
 **/*.exe
