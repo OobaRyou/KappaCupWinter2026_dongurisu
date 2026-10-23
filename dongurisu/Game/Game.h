@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Level3DRender/LevelRender.h"
 
@@ -16,5 +16,7 @@ public:
 private:
 	ModelRender m_modelRender;
 	Vector3 m_pos;
+	ModelRender m_groundRender;				//仮の地面の表示。本物のステージができたら置き換える。
+	PhysicsStaticObject m_groundPhysics;	//仮の地面の当たり判定。
 };
 
