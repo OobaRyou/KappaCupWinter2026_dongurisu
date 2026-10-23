@@ -1,0 +1,14 @@
+# このプロジェクト全体の共通設定 (教材 ObakeKitchen 第1章 に沿った設定)
+root = true
+
+[*]
+# 改行コードはWindowsに揃える
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{h,cpp}]
+# 文字コードをUTF-8(BOM付き)に固定する
+charset = utf-8-bom
+indent_style = tab
+indent_size = 4

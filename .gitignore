@@ -85,3 +85,14 @@ Testing/
 **/*.idb
 **/*.tlog
 **/*.exe
+
+# secrets (do not commit)
+.env
+
+# 再配布できない素材・元データ (公開リポジトリには上げない。変換後の tkm/tks/tka/dds は上げてOK)
+*.fbx
+*.max
+*.blend
+*.blend1
+*.unitypackage
+**/Squirrel_AlbedoTransparency.png
