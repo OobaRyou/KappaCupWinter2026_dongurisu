@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 class Player:public IGameObject
 {
 public:
@@ -10,6 +10,8 @@ public:
 	void Render(RenderContext& rc);
 	//移動処理。
 	void Move();
+	//ジャンプの処理
+	void Jump();
 	//回転処理。
 	void Rotation();
 	//ステート管理。
@@ -20,12 +22,19 @@ public:
 	ModelRender modelRender;	//モデルレンダ―。
 	Vector3 position;			//座標。
 	enum EnAnimationClip {		//アニメーション。
+		enAnimationClip_idle,
+		enAnimationClip_idle2,
 		enAnimationClip_run,
+		enAnimationClip_dying,
 		enAnimationClip_Num,
 	};
 	AnimationClip animationClips[enAnimationClip_Num];		//アニメーションクリップ。
+	//確認用：再生するアニメーションを固定する番号。-1なら自動(移動中はrun、止まっているとidle)。
+	int previewAnimation = -1;
+	FontRender fontRender;		//確認用の文字表示。
 	CharacterController characterController;  //キャラクターコントローラー。
 	Vector3 moveSpeed;		//移動速度。
 	Quaternion rotation;  //クォータニオン。
+	const float GRAVITY = 50.0f;
 };
 
