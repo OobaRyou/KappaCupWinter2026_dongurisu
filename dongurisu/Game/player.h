@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include"InputHelper.h"
+#include"Bullet.h"
 class Player:public IGameObject
 {
 public:
@@ -19,6 +20,8 @@ public:
 	void ManageState();
 	//アニメーションの再生。
 	void PlayAnimation();
+	//弾発射
+	void Fire();
 	//メンバ変数。
 	ModelRender modelRender;	//モデルレンダ―。
 	Vector3 position;			//座標。
@@ -39,5 +42,6 @@ public:
 	Vector3 moveSpeed;		//移動速度。
 	Quaternion rotation;  //クォータニオン。
 	InputHelper m_input;	//操作の判定(パッドとキーボードの違いをまとめる)。
+	float m_fireTimer = 0.0f;	//次に撃てるまでの時間
 };
 

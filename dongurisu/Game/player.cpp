@@ -14,6 +14,14 @@ namespace {
 	const float GRAVITY = 1200.0f;
 	/** 1フレームの時間(秒)。 */
 	const float DELTA_TIME = 1.0f / 60.0f;
+	//ドングリの弾の速さ
+	const float BULLET_SPEED = 600.0f;
+	//発射位置高さ
+	const float MOUTH_HEIGHT = 12.0f;
+	//発射位置中心からの距離
+	const float MOUTH_FORWARD = 10.0f;
+	//撃つクールタイム
+	const float FIRE_INTERVAL = 0.1f;
 }
 
 Player::Player()
@@ -50,6 +58,9 @@ void Player::Update()
 	Jump();
 	//移動処理。
 	Move();
+
+	//弾発射
+	Fire();
 
 	//回転処理。
 	Rotation();
@@ -169,4 +180,31 @@ void Player::Render(RenderContext& rc)
 	//リス描画処理
 	modelRender.Draw(rc);
 	fontRender.Draw(rc);
+}
+void Player::Fire()
+{
+	m_fireTimer -= DELTA_TIME;
+	//まだ撃てる時間でなかったら何もしない
+	if (m_fireTimer > 0.0f)
+	{
+		return;
+	}
+	if (!m_input.IsFirePress()) {
+		return;
+	}
+	//カメラの向いている方向に撃つ(照準とカメラの向きを合わせる仕様)。
+	Vector3 direction = g_camera3D->GetForward();
+
+	//発射位置はリスの口のあたり。足元から上へ、撃つ方向へ少し前に出す。
+	Vector3 front = direction;
+	front.y = 0.0f;
+	front.Normalize();
+	Vector3 firePosition = position + Vector3(0.0f, MOUTH_HEIGHT, 0.0f) + front * MOUTH_FORWARD;
+
+	//どんぐり弾を作って、位置と速度を教える。
+	Bullet* bullet = NewGO<Bullet>(0, "bullet");
+	bullet->SetPosition(firePosition);
+	bullet->SetVelocity(direction * BULLET_SPEED);
+	//撃ったので、次に撃てる時間までの時間をセットする
+	m_fireTimer = FIRE_INTERVAL;
 }
