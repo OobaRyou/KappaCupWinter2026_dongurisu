@@ -26,6 +26,8 @@ public:
 		enAnimationClip_idle2,
 		enAnimationClip_run,
 		enAnimationClip_dying,
+		enAnimationClip_walk,
+		enAnimationClip_jump,
 		enAnimationClip_Num,
 	};
 	AnimationClip animationClips[enAnimationClip_Num];		//アニメーションクリップ。

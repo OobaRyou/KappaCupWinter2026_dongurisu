@@ -17,6 +17,11 @@ Player::Player()
 	animationClips[enAnimationClip_run].SetLoopFlag(true);
 	animationClips[enAnimationClip_dying].Load("Assets/modelData/dying.tka");
 	animationClips[enAnimationClip_dying].SetLoopFlag(false);
+	animationClips[enAnimationClip_walk].Load("Assets/modelData/walk.tka");
+	animationClips[enAnimationClip_walk].SetLoopFlag(true);
+	//ジャンプは1回だけ再生する。
+	animationClips[enAnimationClip_jump].Load("Assets/modelData/jump.tka");
+	animationClips[enAnimationClip_jump].SetLoopFlag(false);
 	//ユニティちゃんのモデルを読み込む。
 	modelRender.Init("Assets/modelData/Squirrel.tkm", animationClips, enAnimationClip_Num, enModelUpAxisY);
 
@@ -116,8 +121,8 @@ void Player::Rotation()
 }
 void Player::PlayAnimation()
 {
-	//確認用：Aボタン(キーボードのJ)で 自動→idle→idle2→run→dying→自動… と切り替える。
-	if (g_pad[0]->IsTrigger(enButtonA)) {
+	//確認用：Aボタン(キーボードのJ)で 自動→idle→idle2→run→dying→walk→jump→自動… と切り替える。
+	if (g_pad[0]->IsTrigger(enButtonY)) {
 		previewAnimation++;
 		if (previewAnimation >= enAnimationClip_Num) {
 			previewAnimation = -1;
@@ -126,8 +131,11 @@ void Player::PlayAnimation()
 
 	int animNo = previewAnimation;
 	if (animNo == -1) {
-		//自動：移動していたらrun、止まっていたらidle。
-		if (fabsf(moveSpeed.x) >= 0.001f || fabsf(moveSpeed.z) >= 0.001f) {
+		//自動：空中ならjump、移動していたらrun、止まっていたらidle。
+		if (!characterController.IsOnGround()) {
+			animNo = enAnimationClip_jump;
+		}
+		else if (fabsf(moveSpeed.x) >= 0.001f || fabsf(moveSpeed.z) >= 0.001f) {
 			animNo = enAnimationClip_run;
 		}
 		else {
@@ -137,7 +145,7 @@ void Player::PlayAnimation()
 	modelRender.PlayAnimation(animNo, 0.2f);
 
 	//再生中のアニメーション名を表示する。
-	const wchar_t* animNames[enAnimationClip_Num] = { L"idle", L"idle2", L"run", L"dying" };
+	const wchar_t* animNames[enAnimationClip_Num] = { L"idle", L"idle2", L"run", L"dying", L"walk", L"jump" };
 	wchar_t text[128];
 	swprintf_s(text, L"anim: %s%s\n[J / A] change", animNames[animNo], previewAnimation == -1 ? L" (auto)" : L"");
 	fontRender.SetText(text);
@@ -147,7 +155,7 @@ void Player::PlayAnimation()
 //描画処理。
 void Player::Render(RenderContext& rc)
 {
-	//ユニティちゃんを描画する。
+	//リス描画処理
 	modelRender.Draw(rc);
 	fontRender.Draw(rc);
 }
