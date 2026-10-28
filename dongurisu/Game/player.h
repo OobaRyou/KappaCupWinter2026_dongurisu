@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include"InputHelper.h"
 class Player:public IGameObject
 {
 public:
@@ -37,6 +38,6 @@ public:
 	CharacterController characterController;  //キャラクターコントローラー。
 	Vector3 moveSpeed;		//移動速度。
 	Quaternion rotation;  //クォータニオン。
-	const float GRAVITY = 50.0f;
+	InputHelper m_input;	//操作の判定(パッドとキーボードの違いをまとめる)。
 };
 

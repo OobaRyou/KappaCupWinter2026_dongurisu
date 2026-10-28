@@ -4,6 +4,16 @@
 namespace {
 	/** モデルの原点は足元より上にあるので、表示するときにこの分だけ上げて足を地面に合わせる。 */
 	const float MODEL_FOOT_OFFSET = 9.4f;
+	/** 歩きの速さ。 */
+	const float WALK_SPEED = 60.0f;
+	/** ダッシュの速さ。 */
+	const float DASH_SPEED = 240.0f;
+	/** ジャンプの初速(1秒あたり)。重力と合わせて、滞空が約0.45秒・高さが約30になる。 */
+	const float JUMP_SPEED = 270.0f;
+	/** 重力加速度(1秒あたり)。ジャンプアニメの空中の長さ(約0.45秒)に合わせた値。 */
+	const float GRAVITY = 1200.0f;
+	/** 1フレームの時間(秒)。 */
+	const float DELTA_TIME = 1.0f / 60.0f;
 }
 
 Player::Player()
@@ -34,13 +44,15 @@ Player::~Player()
 }
 void Player::Update()
 {
+	//入力を読む。移動やジャンプより先に呼ぶ。
+	m_input.Update();
+	//ジャンプ処理。上下の速さを決めてから移動させるので、Move より先に呼ぶ。
+	Jump();
 	//移動処理。
 	Move();
 
 	//回転処理。
 	Rotation();
-	// ジャンプ処理
-	Jump();
 
 	//アニメーションの再生。
 	PlayAnimation();
@@ -67,21 +79,20 @@ void Player::Move()
 	forward.y = 0.0f;
 	right.y = 0.0f;
 
+	//ダッシュか歩きかで速さを変える。
+	float speed = WALK_SPEED;
+	if (m_input.IsDash()) {
+		speed = DASH_SPEED;
+	}
+
 	// スティックの入力に応じて移動速度を設定する
-	right *= stickL.x * 120.0f;
-	forward *= stickL.y * 120.0f;
+	right *= stickL.x * speed;
+	forward *= stickL.y * speed;
 
 	moveSpeed += right + forward;
 
-	// セレクトボタンを押している間は横方向の速度を2倍にする
-	if (g_pad[0]->IsPress(enButtonSelect))
-	{
-		moveSpeed.x *= 2.0f;
-		moveSpeed.z *= 2.0f;
-	}
-
 	// キャラクターを移動させる
-	position = characterController.Execute(moveSpeed, 1.0f / 60.0f);
+	position = characterController.Execute(moveSpeed, DELTA_TIME);
 
 	// モデルの表示位置を更新する
 	modelRender.SetPosition(
@@ -97,15 +108,15 @@ void Player::Jump()
 		moveSpeed.y = 0.0f;
 
 		// Bボタンを押した瞬間にジャンプする
-		if (g_pad[0]->IsTrigger(enButtonB))
+		if (m_input.IsJumpTrigger())
 		{
-			moveSpeed.y = 300.0f;
+			moveSpeed.y = JUMP_SPEED;
 		}
 	}
 	else
 	{
-		// 空中では重力を加える
-		moveSpeed.y -= GRAVITY;
+		// 空中では重力を加える。1フレームの時間を掛けて、FPS が変わっても同じ落ち方にする。
+		moveSpeed.y -= GRAVITY * DELTA_TIME;
 	}
 }
 void Player::Rotation()

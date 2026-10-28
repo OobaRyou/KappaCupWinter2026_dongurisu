@@ -13,6 +13,7 @@
     </ClCompile>
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="player.cpp" />
+    <ClCompile Include="InputHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -21,5 +22,6 @@
     </ClInclude>
     <ClInclude Include="Game.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="InputHelper.h" />
   </ItemGroup>
 </Project>
