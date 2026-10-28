@@ -3,7 +3,7 @@
 #include "Level3DRender/LevelRender.h"
 
 class Player;
-
+class GameCamera;
 class Game : public IGameObject
 {
 public:
@@ -18,5 +18,6 @@ private:
 	Vector3 m_pos;
 	ModelRender m_groundRender;				//仮の地面の表示。本物のステージができたら置き換える。
 	PhysicsStaticObject m_groundPhysics;	//仮の地面の当たり判定。
+	GameCamera* gameCamera;
 };
 
