@@ -43,5 +43,6 @@ public:
 	Quaternion rotation;  //クォータニオン。
 	InputHelper m_input;	//操作の判定(パッドとキーボードの違いをまとめる)。
 	float m_fireTimer = 0.0f;	//次に撃てるまでの時間
+	int m_ammo = 0;			//今の弾薬数
 };
 

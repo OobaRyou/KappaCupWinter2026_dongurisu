@@ -26,6 +26,8 @@ namespace {
 	const int FRAGMENT_COUNT = 10;
 	//広がる角度
 	const float SPREAD_ANGLE = 15.0f;
+	//弾の最大保有数
+	const int MAX_AMMO = 50;
 }
 
 Player::Player()
@@ -49,6 +51,7 @@ Player::Player()
 
 	//キャラコンを初期化する。
 	characterController.Init(6.0f,8.0f, position);
+	m_ammo = MAX_AMMO;
 }
 Player::~Player()
 {
@@ -196,6 +199,10 @@ void Player::Render(RenderContext& rc)
 void Player::Fire()
 {
 	m_fireTimer -= DELTA_TIME;
+	if (m_ammo == 0)
+	{
+		return;
+	}
 	//まだ撃てる時間でなかったら何もしない
 	if (m_fireTimer > 0.0f)
 	{
@@ -230,6 +237,7 @@ void Player::Fire()
 		bullet->SetPosition(firePosition);
 		bullet->SetVelocity(fragmentDirection* BULLET_SPEED);
 	}
+	m_ammo -= 1;
 	//撃ったので、次に撃てる時間までの時間をセットする
 	m_fireTimer = FIRE_INTERVAL;
 }
