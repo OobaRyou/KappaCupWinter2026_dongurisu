@@ -9,9 +9,19 @@ namespace
 }
 bool Bullet::Start()
 {
-	m_modelRender.Init("Assets/modelData/acorn.tkm", nullptr, 0, enModelUpAxisY);
+	m_modelRender.Init("Assets/modelData/acorn_fragment.tkm", nullptr, 0, enModelUpAxisY);
 	m_modelRender.SetScale(2.0f, 2.0f, 2.0f);
 	m_modelRender.SetPosition(m_position);
+	//破片事に最初の向きをバラバラにする
+	float angleY = rand() / (float)RAND_MAX * 360.0f;
+	float angleX = rand() / (float)RAND_MAX * 360.0f;
+	Quaternion rotY;
+	rotY.SetRotationDeg(Vector3::AxisY, angleY);
+	Quaternion rotX;
+	rotX.SetRotationDeg(Vector3::AxisX, angleX);
+	rotY.Multiply(rotX);
+	m_rotation = rotY;
+	m_modelRender.SetRotation(rotY);//Rotation()はこの向きから回り始める
 	m_modelRender.Update();
 	return true;
 }
@@ -22,8 +32,9 @@ void Bullet::Update()
 	//速度の分だけ進む
 	m_position += m_velocity * DELTA_TIME;
 	m_modelRender.SetPosition(m_position);
+	Rotation();
 	m_modelRender.Update();
-
+	
 
 	if (PhysicsWorld::GetInstance()->RayTest(oldPosition, m_position, hitPos))
 	{
@@ -42,4 +53,12 @@ void Bullet::Update()
 void Bullet::Render(RenderContext& rc)
 {
 	m_modelRender.Draw(rc);
+}
+void Bullet::Rotation()
+{
+	//回転を加算する。
+	m_rotation.AddRotationDegY(2.0f);
+
+	//絵描きさんに回転を教える。
+	m_modelRender.SetRotation(m_rotation);
 }
