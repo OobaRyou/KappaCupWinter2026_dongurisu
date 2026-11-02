@@ -154,13 +154,21 @@ void Player::PlayAnimation()
 	int animNo = previewAnimation;
 	if (animNo == -1) {
 		//自動：空中ならjump、移動していたらrun、止まっていたらidle。
-		if (!characterController.IsOnGround()) {
+		if (!characterController.IsOnGround())
+		{
 			animNo = enAnimationClip_jump;
 		}
 		else if (fabsf(moveSpeed.x) >= 0.001f || fabsf(moveSpeed.z) >= 0.001f) {
-			animNo = enAnimationClip_run;
+			//移動中：ダッシュならrun、歩きならwalk。
+			if (m_input.IsDash()) {
+				animNo = enAnimationClip_run;
+			}
+			else {
+				animNo = enAnimationClip_walk;
+			}
 		}
 		else {
+
 			animNo = enAnimationClip_idle;
 		}
 	}
