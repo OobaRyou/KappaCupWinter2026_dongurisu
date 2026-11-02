@@ -28,6 +28,12 @@ namespace {
 	const float SPREAD_ANGLE = 15.0f;
 	//弾の最大保有数
 	const int MAX_AMMO = 50;
+	//最大HP
+	const int MAX_HP = 50;
+	//無敵時間
+	const float INVINCIBLE_TIME = 1.0f;
+	//確認用：Lキー(Xボタン)で受けるダメージ。
+	const int DEBUG_DAMAGE = 10;
 }
 
 Player::Player()
@@ -52,6 +58,7 @@ Player::Player()
 	//キャラコンを初期化する。
 	characterController.Init(6.0f,8.0f, position);
 	m_ammo = MAX_AMMO;
+	m_hp = MAX_HP;
 }
 Player::~Player()
 {
@@ -61,6 +68,12 @@ void Player::Update()
 {
 	//入力を読む。移動やジャンプより先に呼ぶ。
 	m_input.Update();
+	//無敵時間を減らす。0より下は「無敵ではない」と同じ扱いなので、そのままでよい。
+	m_invincibleTimer -= DELTA_TIME;
+	//確認用：Lキー(Xボタン)でダメージを受ける。敵の攻撃ができたら消す。
+	if (g_pad[0]->IsTrigger(enButtonX)) {
+		Damage(DEBUG_DAMAGE);
+	}
 	//ジャンプ処理。上下の速さを決めてから移動させるので、Move より先に呼ぶ。
 	Jump();
 	//移動処理。
@@ -184,7 +197,8 @@ void Player::PlayAnimation()
 	//再生中のアニメーション名を表示する。
 	const wchar_t* animNames[enAnimationClip_Num] = { L"idle", L"idle2", L"run", L"dying", L"walk", L"jump" };
 	wchar_t text[128];
-	swprintf_s(text, L"anim: %s%s\n[J / A] change", animNames[animNo], previewAnimation == -1 ? L" (auto)" : L"");
+	//確認用：HPと弾薬数も表示する。
+	swprintf_s(text, L"anim: %s%s\n[J / A] change\nHP: %d  ammo: %d", animNames[animNo], previewAnimation == -1 ? L" (auto)" : L"", m_hp, m_ammo);
 	fontRender.SetText(text);
 	fontRender.SetPosition(-900.0f, 400.0f, 0.0f);
 }
@@ -240,4 +254,22 @@ void Player::Fire()
 	m_ammo -= 1;
 	//撃ったので、次に撃てる時間までの時間をセットする
 	m_fireTimer = FIRE_INTERVAL;
+}
+void Player::Damage(int damage)
+{
+
+	if (m_invincibleTimer > 0.0f)
+	{
+		return;
+	}
+	m_hp -= damage;
+	m_invincibleTimer = INVINCIBLE_TIME;
+	if (m_hp <= 0)
+	{
+		m_hp = 0;
+	}
+}
+bool Player:: IsDead() const
+{
+	return m_hp <= 0;
 }

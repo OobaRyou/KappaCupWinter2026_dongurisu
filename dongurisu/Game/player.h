@@ -22,6 +22,10 @@ public:
 	void PlayAnimation();
 	//弾発射
 	void Fire();
+	//ダメージ
+	void Damage(int damage);
+	//死亡判定
+	bool IsDead()const;
 	//メンバ変数。
 	ModelRender modelRender;	//モデルレンダ―。
 	Vector3 position;			//座標。
@@ -44,5 +48,7 @@ public:
 	InputHelper m_input;	//操作の判定(パッドとキーボードの違いをまとめる)。
 	float m_fireTimer = 0.0f;	//次に撃てるまでの時間
 	int m_ammo = 0;			//今の弾薬数
+	int m_hp = 0;			//体力
+	float m_invincibleTimer = 0.0f;		//被弾後の無敵時間
 };
 
