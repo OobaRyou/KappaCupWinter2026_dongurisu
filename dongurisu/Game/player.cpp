@@ -22,6 +22,10 @@ namespace {
 	const float MOUTH_FORWARD = 10.0f;
 	//撃つクールタイム
 	const float FIRE_INTERVAL = 0.1f;
+	//一回の発射で出る量
+	const int FRAGMENT_COUNT = 10;
+	//広がる角度
+	const float SPREAD_ANGLE = 15.0f;
 }
 
 Player::Player()
@@ -208,11 +212,24 @@ void Player::Fire()
 	front.y = 0.0f;
 	front.Normalize();
 	Vector3 firePosition = position + Vector3(0.0f, MOUTH_HEIGHT, 0.0f) + front * MOUTH_FORWARD;
-
-	//どんぐり弾を作って、位置と速度を教える。
-	Bullet* bullet = NewGO<Bullet>(0, "bullet");
-	bullet->SetPosition(firePosition);
-	bullet->SetVelocity(direction * BULLET_SPEED);
+	
+	for (int i=0;i < FRAGMENT_COUNT;i++)
+	{
+		float yawt = rand() / (float)RAND_MAX;
+		float yawAngle = (yawt * 2.0f - 1.0f) * SPREAD_ANGLE;
+		float pitcht = rand() / (float)RAND_MAX;
+		float pitchAngle = (pitcht * 2.0f - 1.0f) * SPREAD_ANGLE;
+		Vector3 fragmentDirection = direction;
+		Quaternion yaw;
+		yaw.SetRotationDeg(Vector3::Up, yawAngle);                  //真上を軸に回す → 左右に振れる。
+		yaw.Apply(fragmentDirection);
+		Quaternion pitch;
+		pitch.SetRotationDeg(g_camera3D->GetRight(), pitchAngle);   //カメラの右向きを軸に回す → 上下に振れる。
+		pitch.Apply(fragmentDirection);
+		Bullet* bullet = NewGO<Bullet>(0, "bullet");
+		bullet->SetPosition(firePosition);
+		bullet->SetVelocity(fragmentDirection* BULLET_SPEED);
+	}
 	//撃ったので、次に撃てる時間までの時間をセットする
 	m_fireTimer = FIRE_INTERVAL;
 }
