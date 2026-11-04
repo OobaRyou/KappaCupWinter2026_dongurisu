@@ -21,6 +21,8 @@ bool GameCamera::Start()
 	g_camera3D->SetNear(1.0f);
 	g_camera3D->SetFar(10000.0f);
 
+	m_cameraCollisionSolver.Init(1.0f);
+
 	return true;
 }
 void GameCamera::Update()
@@ -62,9 +64,12 @@ void GameCamera::Update()
 
 	//視点を計算する。
 	Vector3 pos = target + m_toCameraPos;
+	//木や地形にめり込まないように、ぶつかったら手前に寄せる。
+	Vector3 newpos;
+	m_cameraCollisionSolver.Execute(newpos, pos, target);
 	//メインカメラに注視点と視点を設定する。
 	g_camera3D->SetTarget(target);
-	g_camera3D->SetPosition(pos);
+	g_camera3D->SetPosition(newpos);
 
 	//カメラの更新。
 	g_camera3D->Update();
