@@ -66,6 +66,15 @@ Player::~Player()
 }
 void Player::Update()
 {
+
+	if (IsDead())
+	{	//アニメーションの再生。
+		PlayAnimation();
+
+		//絵描きさんの更新処理。
+		modelRender.Update();
+		return;
+	}
 	//入力を読む。移動やジャンプより先に呼ぶ。
 	m_input.Update();
 	//無敵時間を減らす。0より下は「無敵ではない」と同じ扱いなので、そのままでよい。
@@ -173,8 +182,12 @@ void Player::PlayAnimation()
 
 	int animNo = previewAnimation;
 	if (animNo == -1) {
+		if (IsDead() == true)
+		{
+			animNo = enAnimationClip_dying;
+		}
 		//自動：空中ならjump、移動していたらrun、止まっていたらidle。
-		if (!characterController.IsOnGround())
+		else if (!characterController.IsOnGround())
 		{
 			animNo = enAnimationClip_jump;
 		}
