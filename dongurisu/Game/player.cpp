@@ -79,6 +79,8 @@ void Player::Update()
 	m_input.Update();
 	//無敵時間を減らす。0より下は「無敵ではない」と同じ扱いなので、そのままでよい。
 	m_invincibleTimer -= DELTA_TIME;
+	//
+	m_blinkCount += 1;
 	//確認用：Lキー(Xボタン)でダメージを受ける。敵の攻撃ができたら消す。
 	if (g_pad[0]->IsTrigger(enButtonX)) {
 		Damage(DEBUG_DAMAGE);
@@ -219,8 +221,17 @@ void Player::PlayAnimation()
 //描画処理。
 void Player::Render(RenderContext& rc)
 {
+	bool isBlinkHidden = m_invincibleTimer > 0.0f && !IsDead() && m_blinkCount % 6 < 3;
+	
+	
+	if (!isBlinkHidden)
+	{
 	//リス描画処理
 	modelRender.Draw(rc);
+	}
+	
+
+	
 	fontRender.Draw(rc);
 }
 void Player::Fire()

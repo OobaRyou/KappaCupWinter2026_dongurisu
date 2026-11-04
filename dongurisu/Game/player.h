@@ -50,5 +50,6 @@ public:
 	int m_ammo = 0;			//今の弾薬数
 	int m_hp = 0;			//体力
 	float m_invincibleTimer = 0.0f;		//被弾後の無敵時間
+	int m_blinkCount = 0;	//点滅用のフレーム数
 };
 
