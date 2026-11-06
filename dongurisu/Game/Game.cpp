@@ -2,14 +2,18 @@
 #include "Game.h"
 #include "Player.h"
 #include "GameCamera.h"
+#include"Snake.h"
 
 bool Game::Start()
 {
 	//レイトレーシング(映り込みの計算)は重いのでオフにする。
 	g_renderingEngine->DisableRaytracing();
-
 	//プレイヤーのオブジェクトを作る。
 	player = NewGO<Player>(0, "player");
+	//ヘビを作って、リスの少し前に置く。
+	Snake* snake = NewGO<Snake>(0, "enemy");
+	snake->SetPosition(Vector3(0.0f, 0.0f, 100.0f));
+	
 	//ゲームカメラのオブジェクトを作る。
 	gameCamera = NewGO<GameCamera>(0, "gamecamera");
 
