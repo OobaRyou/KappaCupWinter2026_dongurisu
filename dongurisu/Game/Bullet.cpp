@@ -1,11 +1,16 @@
 ﻿#include "stdafx.h"
 #include "Bullet.h"
+#include"Enemy.h"
 namespace
 {
 	//球が消えるまでの時間
 	const float LIFE_TIME = 2.0f;
 	//1フレームの時間
 	const float DELTA_TIME = 1.0f / 60.0f;
+	//当たりの半径
+	const float HIT_RADIUS = 30.0f;
+	//弾のダメージ
+	const int BULLET_DAMAGE = 1;
 }
 bool Bullet::Start()
 {
@@ -47,8 +52,25 @@ void Bullet::Update()
 	if (m_timer >= LIFE_TIME)
 	{
 		DeleteGO(this);
-
+		return;
 	}
+	QueryGOs<Enemy>("enemy", [&](Enemy* enemy)
+		{
+			if (enemy->IsDead())
+			{
+				return true;
+			}
+			Vector3 diff = enemy->GetPosition() - m_position;
+			if (diff.Length()<HIT_RADIUS )
+			{
+				enemy->Damage(BULLET_DAMAGE);
+				DeleteGO(this);
+				//一つの破片が２体に当たらないようにここで探すのをやめる
+				return false;
+			}
+			//当たらなかったら次の敵
+			return true;
+		});
 }
 void Bullet::Render(RenderContext& rc)
 {
