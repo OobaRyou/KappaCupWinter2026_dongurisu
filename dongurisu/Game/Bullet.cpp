@@ -63,7 +63,7 @@ void Bullet::Update()
 			Vector3 diff = enemy->GetPosition() - m_position;
 			if (diff.Length()<HIT_RADIUS )
 			{
-				enemy->Damage(BULLET_DAMAGE);
+				enemy->Damage(BULLET_DAMAGE,m_position);
 				DeleteGO(this);
 				//一つの破片が２体に当たらないようにここで探すのをやめる
 				return false;

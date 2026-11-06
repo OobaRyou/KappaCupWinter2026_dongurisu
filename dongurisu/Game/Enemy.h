@@ -27,7 +27,7 @@ public:
 	// ダメージを受ける。
 	// damage 受けるダメージ量。
 	//  return このダメージで倒れたら true。
-	bool Damage(int damage);
+	bool Damage(int damage,const Vector3& hitposion);
 	// 倒れているか。 
 	bool IsDead() const;
 	// 座標を設定する。 
@@ -46,6 +46,8 @@ protected:
 	virtual void Attack() = 0;
 	// 倒れた瞬間の処理。 
 	virtual void OnDead() = 0;
+	//攻撃を始めてよいか。敵ごとの条件（距離など）を子クラスで書く。
+	virtual bool CanAttack() = 0;
 
 	ModelRender m_modelRender;										//モデルレンダー。
 	AnimationClip m_animationClips[static_cast<int>(EnState::Num)];	//アニメーションクリップ。状態の番号で使う。

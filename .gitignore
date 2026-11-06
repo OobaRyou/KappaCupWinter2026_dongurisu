@@ -99,3 +99,8 @@ dongurisu/tools/notion/backup/
 *.blend1
 *.unitypackage
 **/Squirrel_AlbedoTransparency.png
+
+# Unity アセットの元データ (テクスチャの元画像・Unity の管理ファイル)
+*.tif
+*.meta
+dongurisu/Assets/*Oak*.png

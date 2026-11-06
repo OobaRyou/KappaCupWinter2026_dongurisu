@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "Enemy.h"
-
+#include"DamageNumber.h"
 namespace {
 	// アニメーションを切り替えるときの補間時間(秒)。 
 	const float ANIMATION_INTERPOLATE_TIME = 0.2f;
@@ -79,7 +79,7 @@ void Enemy::UpdateIdleAndMove()
 
 	//攻撃の時間が来たら、攻撃を始める。当たる瞬間の処理はアニメーションイベントで呼ぶ。
 	m_attackTimer += g_gameTime->GetFrameDeltaTime();
-	if (m_attackTimer >= m_attackInterval)
+	if (m_attackTimer >= m_attackInterval&&CanAttack())
 	{
 		m_attackTimer = 0.0f;
 		m_state = EnState::Attack;
@@ -106,13 +106,15 @@ void Enemy::Render(RenderContext& rc)
 	m_modelRender.Draw(rc);
 }
 
-bool Enemy::Damage(int damage)
+bool Enemy::Damage(int damage, const Vector3& hitposion)
 {
 	//もう倒れていたら何もしない(ショットガンの破片が同じフレームに何個も当たることがあるため)。
 	if (IsDead())
 	{
 		return false;
 	}
+	DamageNumber *damageNumber=NewGO<DamageNumber>(0);
+	damageNumber->Init(damage,hitposion);
 	m_hp -= damage;
 	if (m_hp <= 0)
 	{
