@@ -26,6 +26,12 @@ public:
 	void Damage(int damage);
 	//死亡判定
 	bool IsDead()const;
+	//forward の向きに壁があるかを調べる。あったら wallNormal に壁の向きを入れて true を返す。
+	bool FindWall(const Vector3& forward, Vector3& wallNormal);
+	//登り中の移動。
+	void Climb();
+	//壁に近づきすぎていたら外へ押し出す。
+	void PushOutFromWall();
 	//メンバ変数。
 	ModelRender modelRender;	//モデルレンダ―。
 	Vector3 position;			//座標。
@@ -36,6 +42,7 @@ public:
 		enAnimationClip_dying,
 		enAnimationClip_walk,
 		enAnimationClip_jump,
+		enAnimationClip_climbStop,	//登っている途中で止まったときの姿勢。
 		enAnimationClip_Num,
 	};
 	AnimationClip animationClips[enAnimationClip_Num];		//アニメーションクリップ。
@@ -51,5 +58,9 @@ public:
 	int m_hp = 0;			//体力
 	float m_invincibleTimer = 0.0f;		//被弾後の無敵時間
 	int m_blinkCount = 0;	//点滅用のフレーム数
+	bool m_isClimbing = false;	//壁に張りついているか。
+	Vector3 m_wallNormal;	//張りついている壁の向き(壁からリスの方へ向かう向き)。
+	float m_wallDistance = 0.0f;	//壁までの距離。
+	float m_climbHeadAngle = 0.0f;	//壁の上での頭の向き(0度で上、90度で右、180度で下)。
 };
 

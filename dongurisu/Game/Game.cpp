@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "GameCamera.h"
 #include"Snake.h"
+#include "Nest.h"
 
 bool Game::Start()
 {
@@ -24,6 +25,10 @@ bool Game::Start()
 	m_groundRender.Init("Assets/modelData/tempGround.tkm", nullptr, 0, enModelUpAxisY);
 	m_groundRender.Update();
 	m_groundPhysics.CreateFromModel(m_groundRender.GetModel(), m_groundRender.GetModel().GetWorldMatrix());
+
+	//巣の木を作る。幹が太いので、リスと重ならないように離して置く。
+	Nest* nest = NewGO<Nest>(0, "nest");
+	nest->SetPosition(Vector3(0.0f, 0.0f, 400.0f));
 
 	return true;
 }

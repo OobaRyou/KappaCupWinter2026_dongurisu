@@ -19,6 +19,7 @@
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Snake.cpp" />
     <ClCompile Include="DamageNumber.cpp" />
+    <ClCompile Include="Nest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -33,5 +34,6 @@
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Snake.h" />
     <ClInclude Include="DamageNumber.h" />
+    <ClInclude Include="Nest.h" />
   </ItemGroup>
 </Project>
