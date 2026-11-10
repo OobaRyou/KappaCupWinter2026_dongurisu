@@ -1,12 +1,16 @@
 ﻿#include "stdafx.h"
 #include "Snake.h"
 #include"player.h"
+#include"Nest.h"
 namespace
 {
 	const float SNAKE_SPEED = 40.0f;
 	const float STOP_DISTANCE = 40.0f;
 	const float ATTACK_RANGE = 50.0f;
 	const int SNAKE_ATTACK_DAMAGE = 10;
+	const float CHASE_DISTANCE = 200.0f;
+	const float NEST_STOP_DISTANCE = 150.0f;
+	const float NEST_ATTACK_RANGE = 160.0f;
 }
 Snake::Snake()
 {
@@ -42,10 +46,20 @@ const char* Snake::GetAnimationFilePath(EnState state)
 }
 void Snake:: Attack()
 {
-	if (m_player == nullptr)
+	if (m_player == nullptr)		
 	{
 		return;
 	}
+	//巣を狙っているときは、巣に届けば巣を噛む。
+	if (!m_isTargetPlayer)			
+	{
+		if (GetDistanceToNest() <= NEST_ATTACK_RANGE)	
+		{
+			m_nest->Damage(SNAKE_ATTACK_DAMAGE);		
+		}
+		return;						
+	}
+	//噛みつきが届く距離にリスがいれば、噛む
 	float distance = GetDistanceToPlayer();
 	if (distance <= ATTACK_RANGE)
 	{
@@ -59,19 +73,40 @@ void Snake::Move()
 	{
 		m_player = FindGO<Player>("player");
 	}
-	//ヘビからリスへの向きと距離を求める。上下は無視する。
-	//Move は距離だけでなく向きも使うので、ここで計算する。
-	Vector3 toPlayer = m_player->position - m_position;
-	toPlayer.y = 0.0f;
-	float distance = toPlayer.Length();
-	toPlayer.Normalize();
-	//近づきすぎていなければ、リスの方へ進む。
-	if (distance > STOP_DISTANCE)
+	if (m_nest == nullptr)
 	{
-		m_position += toPlayer * SNAKE_SPEED * g_gameTime->GetFrameDeltaTime();
+		m_nest = FindGO<Nest>("nest");
 	}
-	//止まっていても、頭をリスの方へ向ける。
-	m_rotation.SetRotationYFromDirectionXZ(toPlayer);
+	UpdateTarget();
+	Vector3 targetPosition;	//目指す位置。
+	float stopDistance;		//止まる距離。
+	if (m_isTargetPlayer)
+	{
+		//リスを目指す。
+		targetPosition = m_player->position;
+		stopDistance = STOP_DISTANCE;
+	}
+	else
+	{
+		//巣を目指す。
+		targetPosition = m_nest->GetPosition();
+		stopDistance = NEST_STOP_DISTANCE;
+	}
+	//ヘビから目標への向きと距離を求める。上下は無視する。
+//Move は距離だけでなく向きも使うので、ここで計算する。
+	Vector3 toTarget = targetPosition - m_position;
+	toTarget.y = 0.0f;
+	float distance = toTarget.Length();
+	toTarget.Normalize();
+	//近づきすぎていなければ、目標の方へ進む。
+	if (distance > stopDistance)
+	{
+		m_position += toTarget * SNAKE_SPEED * g_gameTime->GetFrameDeltaTime();
+	}
+	//止まっていても、頭を目標の方へ向ける。
+	m_rotation.SetRotationYFromDirectionXZ(toTarget);
+	
+	
 }
 void Snake::OnDead()
 {
@@ -83,6 +118,10 @@ bool Snake::CanAttack()
 	{
 		return false;
 	}
+	if (!m_isTargetPlayer)
+	{
+		return GetDistanceToNest() <= NEST_ATTACK_RANGE;
+	}
 	//噛みつきが届く距離にリスがいれば、攻撃を始めてよい。
 	float distance = GetDistanceToPlayer();
 	return distance <= ATTACK_RANGE;
@@ -92,4 +131,26 @@ float Snake::GetDistanceToPlayer()
 	Vector3 toPlayer = m_player->position - m_position;
 	toPlayer.y = 0.0f;
 	return toPlayer.Length();
+}
+float Snake::GetDistanceToNest()
+{
+	Vector3 toNest = m_nest->GetPosition() - m_position;
+	toNest.y = 0.0f;
+	return toNest.Length();
+}
+void Snake::UpdateTarget()
+{
+	//リスまでの距離を高さを含めて求める
+	Vector3 toPlayer = m_player->position - m_position;
+	float distance = toPlayer.Length();
+	//巣が壊れているか。リスが近ければ、リスを狙う
+	if (m_nest->IsBroken() || distance <= CHASE_DISTANCE)
+	{
+		m_isTargetPlayer = true;
+	}
+	//それ以外は巣を狙う
+	else
+	{
+		m_isTargetPlayer = false;
+	}
 }
