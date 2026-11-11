@@ -21,6 +21,7 @@
     <ClCompile Include="DamageNumber.cpp" />
     <ClCompile Include="Nest.cpp" />
     <ClCompile Include="AcornItem.cpp" />
+    <ClCompile Include="WaveManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -37,5 +38,6 @@
     <ClInclude Include="DamageNumber.h" />
     <ClInclude Include="Nest.h" />
     <ClInclude Include="AcornItem.h" />
+    <ClInclude Include="WaveManager.h" />
   </ItemGroup>
 </Project>

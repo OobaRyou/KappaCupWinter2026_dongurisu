@@ -2,8 +2,8 @@
 #include "Game.h"
 #include "Player.h"
 #include "GameCamera.h"
-#include"Snake.h"
 #include "Nest.h"
+#include"WaveManager.h"
 
 bool Game::Start()
 {
@@ -11,9 +11,8 @@ bool Game::Start()
 	g_renderingEngine->DisableRaytracing();
 	//プレイヤーのオブジェクトを作る。
 	player = NewGO<Player>(0, "player");
-	//ヘビを作って、リスの少し前に置く。
-	Snake* snake = NewGO<Snake>(0, "enemy");
-	snake->SetPosition(Vector3(0.0f, 0.0f, 100.0f));
+	//敵の出現を管理するオブジェクトを作る。
+	NewGO<WaveManager>(0, "waveManager");
 	
 	//ゲームカメラのオブジェクトを作る。
 	gameCamera = NewGO<GameCamera>(0, "gamecamera");
