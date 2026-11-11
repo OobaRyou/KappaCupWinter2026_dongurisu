@@ -1,6 +1,11 @@
 ﻿#include "stdafx.h"
 #include "GameCamera.h"
 #include "Player.h"
+namespace
+{
+	const float TARGET_HEIGHT = 40.0f;		//注視点の高さ（リスの足元から）。
+	const float SHOULDER_OFFSET = 0.0f;	//肩越しにするため、注視点と視点を右へずらす量。
+}
 
 GameCamera::GameCamera()
 {
@@ -31,7 +36,7 @@ void GameCamera::Update()
 	//注視点を計算する。
 	Vector3 target = m_player->position;
 	//プレイヤの足元からちょっと上を注視点とする。
-	target.y += 15.0f;
+	target.y += TARGET_HEIGHT;
 
 	Vector3 toCameraPosOld = m_toCameraPos;
 	//パッドの入力を使ってカメラを回す。
@@ -61,6 +66,15 @@ void GameCamera::Update()
 		//カメラが下向きすぎ。
 		m_toCameraPos = toCameraPosOld;
 	}
+
+	//カメラから見た右向き（横だけ）を求めて、注視点を右へずらす。
+	//リスが画面の左寄りに映り、画面のまん中（照準）の先が見えるようになる。
+	Vector3 forward = m_toCameraPos * -1.0f;
+	forward.y = 0.0f;
+	forward.Normalize();
+	Vector3 right;
+	right.Cross(Vector3::AxisY, forward);
+	target += right * SHOULDER_OFFSET;
 
 	//視点を計算する。
 	Vector3 pos = target + m_toCameraPos;
