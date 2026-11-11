@@ -1,8 +1,11 @@
 ﻿#include "stdafx.h"
 #include "Nest.h"
+#include"player.h"
 namespace
 {
 	const int NEST_MAX_HP = 100;
+	const float REFILL_RANGE = 180.0f;//補充できる、木の中心からの横の距離。
+	const float REFILL_TIME = 2.0f;//補充までにかかる時間。
 }
 bool Nest::Start()
 {
@@ -23,11 +26,28 @@ bool Nest::Start()
 	m_colliderRender.Update();
 	//読んだ形から当たり判定を作る。
 	m_physics.CreateFromModel(m_colliderRender.GetModel(), m_colliderRender.GetModel().GetWorldMatrix());
+	m_player = FindGO<Player>("player");
 	m_hp = NEST_MAX_HP;
 	return true;
 }
 void Nest::Update()
 {
+	Vector3 toPlayer = m_player->position - m_position;	//\木からリスへの向き。
+	toPlayer.y = 0;
+	float distance = toPlayer.Length();
+	if (distance <= REFILL_RANGE)
+	{
+		m_refillTimer += g_gameTime->GetFrameDeltaTime();
+		if (m_refillTimer >= REFILL_TIME)
+		{
+			m_player->RefillAmmo();
+			m_refillTimer = 0.0f;
+		}
+	}
+	else
+	{
+		m_refillTimer = 0.0f;
+	}
 	m_modelRender.Update();
 	m_brokenRender.Update();
 }

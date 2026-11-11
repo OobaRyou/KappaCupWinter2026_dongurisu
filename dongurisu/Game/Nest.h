@@ -1,4 +1,5 @@
 ﻿#pragma once
+class Player;
 //リスの巣がある木。見た目と当たり判定を持つ。
 class Nest : public IGameObject
 {
@@ -17,14 +18,17 @@ public:
 	bool IsBroken()const;
 	const Vector3& GetPosition() const;
 
-	Vector3 m_position;				//座標。
+	
 	
 private:
 	ModelRender m_modelRender;		//見た目のモデル。
 	ModelRender m_brokenRender;		//壊れた木のモデル。
+	Vector3 m_position;				//座標。
 	ModelRender m_colliderRender;	//当たり判定の形を読むためのモデル。描画はしない。
 	PhysicsStaticObject m_physics;	//当たり判定。
 	Quaternion m_rotation;			//回転。
-	int m_hp = 0;					//巣の体力
+	int m_hp = 0;					//巣の体力。
+	Player* m_player = nullptr;		//補充する相手のリス。
+	float m_refillTimer = 0.0f;		//範囲にいる時間。
 };
 

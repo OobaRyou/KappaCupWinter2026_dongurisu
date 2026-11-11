@@ -26,6 +26,8 @@ public:
 	void Damage(int damage);
 	//弾薬を増やす
 	void AddAmmo(int amount);
+	//弾薬を満タンにする
+	void RefillAmmo();
 	//死亡判定
 	bool IsDead()const;
 	//forward の向きに壁があるかを調べる。あったら wallNormal に壁の向きを入れて true を返す。

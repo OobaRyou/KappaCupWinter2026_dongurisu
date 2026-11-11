@@ -317,6 +317,10 @@ void Player::AddAmmo(int amount)
 		m_ammo = MAX_AMMO;
 	}
 }
+void Player::RefillAmmo()
+{
+	m_ammo = MAX_AMMO;
+}
 void Player::Fire()
 {
 	m_fireTimer -= DELTA_TIME;
