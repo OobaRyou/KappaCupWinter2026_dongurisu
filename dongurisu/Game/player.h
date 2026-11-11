@@ -22,6 +22,8 @@ public:
 	void PlayAnimation();
 	//弾発射
 	void Fire();
+	/** 照準（画面のまん中）が指している点を探す。敵・木・地面のうち一番近いもの。 */
+	Vector3 FindAimPosition(const Vector3& cameraPosition, const Vector3& cameraForward, float minDistance);
 	//ダメージ
 	void Damage(int damage);
 	//弾薬を増やす

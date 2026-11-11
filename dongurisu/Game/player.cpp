@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "player.h"
+#include "Enemy.h"
 
 namespace {
 	/** モデルの原点は足元より上にあるので、表示するときにこの分だけ上げて足を地面に合わせる。 */
@@ -20,12 +21,22 @@ namespace {
 	const float MOUTH_HEIGHT = 12.0f;
 	//発射位置中心からの距離
 	const float MOUTH_FORWARD = 10.0f;
+	//照準の先を探す一番遠い距離。弾が消えるまでに飛ぶ距離（600×2秒＝1200）に合わせる。
+	const float AIM_MAX_DISTANCE = 1200.0f;
+	//照準の線からこれより近い敵は、照準が指していることにする（弾の当たり判定と同じ大きさ）。
+	const float AIM_ENEMY_RADIUS = 30.0f;
+	//照準の先が口より手前すぎると横に撃ってしまうので、口よりこれだけ奥を最低にする。
+	const float AIM_MIN_DISTANCE_FROM_MOUTH = 30.0f;
+	//木や地面を探す光線を、近い当たりへ縮めながら何回やり直すか（エンジンの光線は一番近い当たりを返さないことがあるため）。
+	const int AIM_RAY_RETRY = 4;
 	//撃つクールタイム
 	const float FIRE_INTERVAL = 0.1f;
 	//一回の発射で出る量
 	const int FRAGMENT_COUNT = 10;
-	//広がる角度
-	const float SPREAD_ANGLE = 15.0f;
+	//広がる角度（片側、度）。照準の枠の内側に収まる角度にしている。
+	//枠の半分の幅は画面で48ピクセル、画面の高さの半分は540ピクセル、縦の画角は60度なので、
+	//atan(48 / 540 × tan(30度)) ≒ 2.9度。照準の画像の大きさを変えたら、ここも合わせて変える。
+	const float SPREAD_ANGLE = 2.9f;
 	//弾の最大保有数
 	const int MAX_AMMO = 50;
 	//最大HP
@@ -336,15 +347,22 @@ void Player::Fire()
 	if (!m_input.IsFirePress()) {
 		return;
 	}
-	//カメラの向いている方向に撃つ(照準とカメラの向きを合わせる仕様)。
-	Vector3 direction = g_camera3D->GetForward();
+	//カメラの向き。
+	Vector3 cameraForward = g_camera3D->GetForward();
 
-	//発射位置はリスの口のあたり。足元から上へ、撃つ方向へ少し前に出す。
-	Vector3 front = direction;
+	//発射位置はリスの口のあたり。足元から上へ、カメラの向きへ少し前に出す。
+	Vector3 front = cameraForward;
 	front.y = 0.0f;
 	front.Normalize();
 	Vector3 firePosition = position + Vector3(0.0f, MOUTH_HEIGHT, 0.0f) + front * MOUTH_FORWARD;
-	
+	//照準が指している点を探して、口からそこへ向けて撃つ。
+	//カメラは肩越しで横にずれているので、カメラの向きのまま撃つと照準から外れる。
+	Vector3 cameraPosition = g_camera3D->GetPosition();
+	float mouthDepth = (firePosition - cameraPosition).Dot(cameraForward);
+	Vector3 aimPosition = FindAimPosition(cameraPosition, cameraForward, mouthDepth + AIM_MIN_DISTANCE_FROM_MOUTH);
+	Vector3 direction = aimPosition - firePosition;
+	direction.Normalize();
+
 	for (int i=0;i < FRAGMENT_COUNT;i++)
 	{
 		float yawt = rand() / (float)RAND_MAX;
@@ -365,6 +383,60 @@ void Player::Fire()
 	m_ammo -= 1;
 	//撃ったので、次に撃てる時間までの時間をセットする
 	m_fireTimer = FIRE_INTERVAL;
+}
+Vector3 Player::FindAimPosition(const Vector3& cameraPosition, const Vector3& cameraForward, float minDistance)
+{
+	//何も無ければ、弾が届く一番遠いところを狙う。
+	float aimDistance = AIM_MAX_DISTANCE;
+
+	//木や地面（当たり判定がある物）を光線で探す。
+	//当たったら光線をその手前まで縮めてやり直し、一番近い当たりを見つける。
+	Vector3 rayEnd = cameraPosition + cameraForward * aimDistance;
+	for (int i = 0; i < AIM_RAY_RETRY; i++)
+	{
+		Vector3 hitPosition;
+		if (!PhysicsWorld::GetInstance()->RayTest(cameraPosition, rayEnd, hitPosition))
+		{
+			break;
+		}
+		float hitDistance = (hitPosition - cameraPosition).Dot(cameraForward);
+		if (hitDistance >= aimDistance)
+		{
+			break;
+		}
+		aimDistance = hitDistance;
+		rayEnd = cameraPosition + cameraForward * (aimDistance - 0.1f);
+	}
+
+	//敵は当たり判定の形を持っていないので、照準の線との距離で探す。
+	QueryGOs<Enemy>("enemy", [&](Enemy* enemy)
+		{
+			if (enemy->IsDead())
+			{
+				return true;
+			}
+			Vector3 toEnemy = enemy->GetPosition() - cameraPosition;
+			//照準の線の上で、敵と同じ奥行きの点までの距離。
+			float enemyDistance = toEnemy.Dot(cameraForward);
+			if (enemyDistance <= 0.0f || enemyDistance >= aimDistance)
+			{
+				//カメラの後ろか、今見つけている物より遠い。
+				return true;
+			}
+			Vector3 fromLine = toEnemy - cameraForward * enemyDistance;
+			if (fromLine.Length() <= AIM_ENEMY_RADIUS)
+			{
+				aimDistance = enemyDistance;
+			}
+			return true;
+		});
+
+	//口より手前を狙うと横や後ろに撃ってしまうので、最低の距離より近くはしない。
+	if (aimDistance < minDistance)
+	{
+		aimDistance = minDistance;
+	}
+	return cameraPosition + cameraForward * aimDistance;
 }
 void Player::Damage(int damage)
 {
