@@ -15,6 +15,7 @@ namespace
 bool Bullet::Start()
 {
 	m_modelRender.Init("Assets/modelData/acorn_fragment.tkm", nullptr, 0, enModelUpAxisY);
+	m_modelRender.SetShadowCasterFlag(false);
 	m_modelRender.SetScale(2.0f, 2.0f, 2.0f);
 	m_modelRender.SetPosition(m_position);
 	//破片事に最初の向きをバラバラにする
