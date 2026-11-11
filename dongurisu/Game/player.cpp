@@ -309,6 +309,14 @@ void Player::Render(RenderContext& rc)
 	
 	fontRender.Draw(rc);
 }
+void Player::AddAmmo(int amount)
+{
+	m_ammo += amount;
+	if (m_ammo >= MAX_AMMO)
+	{
+		m_ammo = MAX_AMMO;
+	}
+}
 void Player::Fire()
 {
 	m_fireTimer -= DELTA_TIME;

@@ -223,6 +223,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AcornItem.cpp" />
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="DamageNumber.cpp" />
     <ClCompile Include="Enemy.cpp" />
@@ -241,6 +242,7 @@
     <ClCompile Include="system\system.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AcornItem.h" />
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="DamageNumber.h" />
     <ClInclude Include="Enemy.h" />

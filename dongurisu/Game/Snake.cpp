@@ -2,6 +2,7 @@
 #include "Snake.h"
 #include"player.h"
 #include"Nest.h"
+#include"AcornItem.h"
 namespace
 {
 	const float SNAKE_SPEED = 40.0f;
@@ -110,6 +111,8 @@ void Snake::Move()
 }
 void Snake::OnDead()
 {
+	AcornItem* acornItem = NewGO<AcornItem>(0,"acornItem");
+	acornItem->SetPosition(m_position);
 
 }
 bool Snake::CanAttack()
