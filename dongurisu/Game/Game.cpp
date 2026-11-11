@@ -4,6 +4,7 @@
 #include "GameCamera.h"
 #include "Nest.h"
 #include"WaveManager.h"
+#include "GameUI.h"
 
 bool Game::Start()
 {
@@ -13,6 +14,8 @@ bool Game::Start()
 	player = NewGO<Player>(0, "player");
 	//敵の出現を管理するオブジェクトを作る。
 	NewGO<WaveManager>(0, "waveManager");
+	//照準などのUIを作る。
+	NewGO<GameUI>(0, "gameUI");
 	
 	//ゲームカメラのオブジェクトを作る。
 	gameCamera = NewGO<GameCamera>(0, "gamecamera");
