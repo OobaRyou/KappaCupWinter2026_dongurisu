@@ -23,6 +23,8 @@ namespace {
 	const float MOUTH_FORWARD = 10.0f;
 	//照準の先を探す一番遠い距離。弾が消えるまでに飛ぶ距離（600×2秒＝1200）に合わせる。
 	const float AIM_MAX_DISTANCE = 1200.0f;
+	//撃ったあと、照準の方を向き続ける時間（秒）。
+	const float AIM_FACE_TIME = 0.5f;
 	//照準の線からこれより近い敵は、照準が指していることにする（弾の当たり判定と同じ大きさ）。
 	const float AIM_ENEMY_RADIUS = 30.0f;
 	//照準の先が口より手前すぎると横に撃ってしまうので、口よりこれだけ奥を最低にする。
@@ -237,6 +239,16 @@ void Player::Jump()
 }
 void Player::Rotation()
 {
+	m_aimTimer -= DELTA_TIME;
+	//撃ったばかりなら、照準の方（カメラの前向き）を向く。移動はそのままなので横歩きになる。
+	if (m_aimTimer > 0.0f)
+	{
+		Vector3 aimDirection = g_camera3D->GetForward();
+		aimDirection.y = 0.0f;
+		rotation.SetRotationYFromDirectionXZ(aimDirection);
+		modelRender.SetRotation(rotation);
+		return;
+	}
 	//xかzの移動速度があったら(スティックの入力があったら)。
 	if (fabsf(moveSpeed.x) >= 0.001f || fabsf(moveSpeed.z) >= 0.001f)
 	{
@@ -383,6 +395,8 @@ void Player::Fire()
 	m_ammo -= 1;
 	//撃ったので、次に撃てる時間までの時間をセットする
 	m_fireTimer = FIRE_INTERVAL;
+	//撃ったので、しばらく照準の方を向く。
+	m_aimTimer = AIM_FACE_TIME;
 }
 Vector3 Player::FindAimPosition(const Vector3& cameraPosition, const Vector3& cameraForward, float minDistance)
 {
